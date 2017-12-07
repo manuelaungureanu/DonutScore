@@ -1,5 +1,6 @@
 package com.chefless.ela.donutscore
 
+import android.app.Application
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -11,9 +12,7 @@ class ScoreActivity : AppCompatActivity() {
 
     var disposable: Disposable? = null
 
-    val scoreApiServe by lazy {
-        ScoreApiService.create()
-    }
+    lateinit var mViewModel:ScoreViewModel
 
     lateinit var scoreView: ScoreView
 
@@ -21,13 +20,14 @@ class ScoreActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
         scoreView = findViewById(R.id.donutView)
+        mViewModel = ScoreViewModel(DataModel(), Application())
     }
 
 
     override fun onResume() {
         super.onResume()
 
-        disposable = scoreApiServe.hitScoreCheck()
+        disposable = mViewModel.getScoreData()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
