@@ -1,10 +1,7 @@
 package com.chefless.ela.donutscore
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.graphics.Paint.Align
@@ -12,31 +9,31 @@ import android.graphics.Paint.Align
 /**
  * Created by ela on 06/12/2017.
  */
-class ScoreView: View {
+class ScoreView : View {
 
-    var ovalOutline = RectF()
+    private var ovalOutline = RectF()
 
-    var ovalScoreOutline = RectF()
+    private var ovalScoreOutline = RectF()
 
-    val paintPrimary = Paint()
+    private val paintPrimary = Paint()
 
-    val paintSecondary = Paint()
+    private val paintSecondary = Paint()
 
-    val mLabelPaint = Paint()
+    private val mLabelPaint = Paint()
 
-    val mScorePaint = Paint()
+    private val mScorePaint = Paint()
 
-    val colorPrimary = Color.BLACK
+    private val colorPrimary = Color.BLACK
 
-    val colorSecondary = Color.GREEN
+    private val colorSecondary = Color.GREEN
 
     var score: Float = 0f
 
-    var max_score: Float = 700f
+    var maxScore: Float = 700f
 
-    val offset_outline:Float = 50f
+    private val offsetOutline: Float = 50f
 
-    val offset_score_outline:Float = 70f
+    private val offsetScoreOutline: Float = 70f
 
     constructor(ctx: Context) : super(ctx)
 
@@ -49,16 +46,18 @@ class ScoreView: View {
 
         displayOutlines(canvas)
 
-        if(canvas!=null)
+        if (canvas != null)
             displayContent(canvas)
     }
 
     private fun displayOutlines(canvas: Canvas?) {
-        val scorePercentageInDegrees = (score / max_score) * 360
+
+        val scorePercentageInDegrees = (score / maxScore) * 360
 
         canvas?.drawArc(ovalOutline, 0f, 360f, false, paintPrimary);
 
         canvas?.drawArc(ovalScoreOutline, -90f, scorePercentageInDegrees, false, paintSecondary)
+
     }
 
     private fun displayContent(canvas: Canvas) {
@@ -74,7 +73,7 @@ class ScoreView: View {
         val scoreAsString = String.format("%.${0}f", score)
         canvas.drawText(scoreAsString, positionXForText, positionYForTextCenter, mScorePaint)
 
-        val maxScoreContent:String = String.format("%s %.${0}f", resources.getString(R.string.out_of), max_score)
+        val maxScoreContent: String = String.format("%s %.${0}f", resources.getString(R.string.out_of), maxScore)
         canvas.drawText(maxScoreContent, positionXForText, positionYForTextBottom, mLabelPaint)
     }
 
@@ -108,7 +107,7 @@ class ScoreView: View {
 
     private fun initOvals(w: Int, h: Int) {
         val minDimen: Float = if (w < h) w.toFloat() else h.toFloat()
-        ovalOutline = RectF(offset_outline, offset_outline, (minDimen - offset_outline), (minDimen - offset_outline))
-        ovalScoreOutline = RectF(offset_score_outline, offset_score_outline, (minDimen - offset_score_outline), (minDimen - offset_score_outline))
+        ovalOutline = RectF(offsetOutline, offsetOutline, (minDimen - offsetOutline), (minDimen - offsetOutline))
+        ovalScoreOutline = RectF(offsetScoreOutline, offsetScoreOutline, (minDimen - offsetScoreOutline), (minDimen - offsetScoreOutline))
     }
 }

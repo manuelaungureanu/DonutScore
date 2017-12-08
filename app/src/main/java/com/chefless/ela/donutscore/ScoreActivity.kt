@@ -1,50 +1,60 @@
 package com.chefless.ela.donutscore
 
 import android.app.Application
-import android.support.v7.app.AppCompatActivity
+import android.arch.lifecycle.*
+import android.graphics.Color
 import android.os.Bundle
-import android.widget.Toast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import android.support.v7.app.AppCompatActivity
+import android.view.animation.AnimationUtils
+import android.view.animation.Animation
 
-class ScoreActivity : AppCompatActivity() {
 
-    var disposable: Disposable? = null
+class ScoreActivity : AppCompatActivity(), LifecycleOwner {
 
-    lateinit var mViewModel:ScoreViewModel
+    private lateinit var viewModel: ScoreViewModel
 
-    lateinit var scoreView: ScoreView
+    private lateinit var scoreView: ScoreView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_score)
         scoreView = findViewById(R.id.donutView)
-        mViewModel = ScoreViewModel(DataModel(), Application())
+        viewModel = obtainViewModel(this)
+        viewModel.scoreData.observe(this, Observer { result -> refreshView(result) })
+
+        animateScoreView(android.R.anim.fade_in)
     }
 
+    private fun refreshView(result: Model.Result?) {
+        animateScoreView(android.R.anim.fade_out)
 
-    override fun onResume() {
-        super.onResume()
-
-        disposable = mViewModel.getScoreData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { result -> refreshView(result)},
-                        { error -> Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show() }
-                )
+        scoreView.score = result?.creditReportInfo?.score ?: 0f
+        scoreView.maxScore = result?.creditReportInfo?.maxScoreValue ?: 0f
+        scoreView.invalidateOutline()
     }
 
-    private fun refreshView(result: Model.Result){
-        scoreView.score = result.creditReportInfo.score
-        scoreView.max_score = result.creditReportInfo.maxScoreValue
-        scoreView.invalidate()
+    private fun animateScoreView(animationId: Int) {
+        val mLoadAnimation = AnimationUtils.loadAnimation(applicationContext, animationId)
+        scoreView.startAnimation(mLoadAnimation)
     }
 
-    override fun onPause() {
-        super.onPause()
+    private fun obtainViewModel(activity: AppCompatActivity): ScoreViewModel {
 
-        disposable?.dispose()
+        //TODO: to build injection instead of passing concrete instance of DataModel
+        val dataModel = DataModel()
+        // Use a Factory to inject dependencies into the ViewModel
+        val factory = ScoreViewModelFactory(dataModel)
+
+        return ViewModelProviders.of(activity, factory).get(ScoreViewModel::class.java)
+    }
+
+    /** Simple factory class to provide view model */
+    inner class ScoreViewModelFactory(private val dataModel: DataModel) : ViewModelProvider.NewInstanceFactory() {
+
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+
+            return ScoreViewModel(dataModel, Application()) as T
+        }
     }
 }

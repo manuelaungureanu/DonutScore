@@ -1,19 +1,15 @@
 package com.chefless.ela.donutscore
 
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-
 /**
  * Created by ela on 07/12/2017.
  */
-class DataModel: IDataModel {
+class DataModel : IDataModel {
 
-    val scoreApiServe by lazy {
+    private val scoreApiService by lazy {
         ScoreApiService.create()
     }
 
-    override fun getScoreData(): Observable<Model.Result>
-    {
-        return scoreApiServe.hitScoreCheck()
+    override fun getScoreData(): RetrofitLiveData<Model.Result> {
+        return RetrofitLiveData(scoreApiService.hitScoreCheck())
     }
 }

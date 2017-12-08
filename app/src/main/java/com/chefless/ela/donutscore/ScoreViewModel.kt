@@ -2,27 +2,25 @@ package com.chefless.ela.donutscore
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import android.content.Context
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by ela on 07/12/2017.
  */
-class ScoreViewModel: AndroidViewModel {
+class ScoreViewModel : AndroidViewModel {
 
-    var mDataModel: IDataModel
+    private lateinit var mDataModel: IDataModel
 
-    //Application context will be used to prevent memory leaks
-    lateinit var mContext: Context
+    lateinit var scoreData: RetrofitLiveData<Model.Result>
 
-    constructor(mDataModel: IDataModel, mContext:Application): super(mContext)
-    {
+    constructor(mContext: Application) : super(mContext)
+
+    constructor(mDataModel: IDataModel, mContext: Application) : super(mContext) {
         this.mDataModel = mDataModel
+        this.scoreData = mDataModel.getScoreData()
     }
 
-    fun getScoreData(): Observable<Model.Result> {
-        return mDataModel.getScoreData()
+    override fun onCleared() {
+        scoreData.cancel()
     }
 }
 

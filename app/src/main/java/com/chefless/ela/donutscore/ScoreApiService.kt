@@ -1,16 +1,15 @@
 package com.chefless.ela.donutscore
 
-import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Query
+import retrofit2.Call
 
 interface ScoreApiService {
 
     @GET("values")
-    fun hitScoreCheck(): Observable<Model.Result>
+    fun hitScoreCheck(): Call<Model.Result>
 
     companion object {
         fun create(): ScoreApiService {
@@ -24,5 +23,4 @@ interface ScoreApiService {
             return retrofit.create(ScoreApiService::class.java)
         }
     }
-
 }
